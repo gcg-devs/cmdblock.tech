@@ -16,9 +16,39 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "cmdblock.tech — Boutique Software Engineering Studio",
+  metadataBase: new URL("https://cmdblock.tech"),
+  title: {
+    default: "cmdblock.tech — Boutique Software Engineering Studio",
+    template: "%s | cmdblock.tech",
+  },
   description:
     "We architect and build custom web applications, enterprise systems, and interactive software from the ground up.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    url: "https://cmdblock.tech",
+    siteName: "cmdblock.tech",
+    title: "cmdblock.tech — Boutique Software Engineering Studio",
+    description:
+      "We architect and build custom web applications, enterprise systems, and interactive software from the ground up.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "cmdblock.tech — Boutique Software Engineering Studio",
+    description:
+      "We architect and build custom web applications, enterprise systems, and interactive software from the ground up.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export default function RootLayout({

@@ -42,7 +42,7 @@ export function DeleteEntityDialog({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="destructive" disabled={isPending}>
+        <Button variant="outline" disabled={isPending}>
           {isPending ? "Deleting…" : "Delete"}
         </Button>
       </AlertDialogTrigger>
@@ -58,7 +58,6 @@ export function DeleteEntityDialog({
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
             Delete
           </AlertDialogAction>

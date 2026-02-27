@@ -125,7 +125,7 @@ export async function updateInvoice(
   await prisma.invoice.update({
     where: { id },
     data: {
-      projectId: projectId || null,
+      project: projectId ? { connect: { id: projectId } } : { disconnect: true },
       type: (type as "MOBILIZATION" | "MILESTONE" | "FINAL" | "ONE_OFF") || "ONE_OFF",
       issueDate: new Date(issueDate),
       dueDate: new Date(dueDate),

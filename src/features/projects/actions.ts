@@ -76,7 +76,7 @@ export async function updateProject(
   await prisma.project.update({
     where: { id },
     data: {
-      clientId,
+      client: { connect: { id: clientId } },
       title: title.trim(),
       totalContractValue,
       currency: currency === "USD" ? "USD" : "PHP",

@@ -15,7 +15,6 @@ The public portfolio homepage currently has minimal SEO metadata, limiting disco
 - `seo-metadata`: Centralized, production-grade metadata behavior for root portfolio SEO and social previews.
 
 ### Modified Capabilities
-- `homepage`: Strengthen homepage discoverability and sharing metadata without changing visible page content.
 - `shareable-invoice`: Provide custom shared-invoice embed title and description metadata while preserving noindex behavior.
 
 ## Impact

@@ -1,9 +1,7 @@
 ## Purpose
 
 Enables public unauthenticated access to invoices via shareable links, including token generation, public viewing, and PDF download.
-
 ## Requirements
-
 ### Requirement: Share token generation
 The system SHALL allow the user to generate a share token for an invoice from the invoice detail page. The token SHALL be a UUID v4 stored in the `shareToken` field. When generated, `isPublic` SHALL be set to true.
 
@@ -39,7 +37,7 @@ The system SHALL serve a public route at `/share/invoice/[shareToken]` that disp
 - **THEN** the page returns a 404 not-found response
 
 ### Requirement: Public page layout
-The public invoice page SHALL use a minimal layout with the application header (no sidebar navigation). The main content area SHALL show the HTML invoice preview. A right sidebar panel SHALL display invoice metadata (status, due date, amount due) and a download PDF button.
+The public invoice page SHALL use a minimal layout with the application header (no sidebar navigation). The main content area SHALL show the HTML invoice preview. A right sidebar panel SHALL display invoice metadata (status, due date, amount due) and a download PDF button. The route SHALL also emit custom share metadata (title and description) derived from invoice context while remaining excluded from indexing.
 
 #### Scenario: Layout structure
 - **WHEN** the public invoice page renders
@@ -48,6 +46,11 @@ The public invoice page SHALL use a minimal layout with the application header (
 #### Scenario: No-index for search engines
 - **WHEN** the public invoice page renders
 - **THEN** the page includes a robots meta tag with `noindex, nofollow`
+
+#### Scenario: Custom shared-invoice embed metadata
+- **WHEN** a social platform fetches metadata for `/share/invoice/[validToken]`
+- **THEN** the page responds with a route-specific title and description suitable for link previews
+- **THEN** metadata wording is based on non-sensitive invoice context only
 
 ### Requirement: Layout fixes
 The invoice detail page SHALL display the line items summary below the form, not in a side column. The project detail page SHALL display the invoices table below the form, not in a side column.
@@ -59,3 +62,4 @@ The invoice detail page SHALL display the line items summary below the form, not
 #### Scenario: Project detail layout
 - **WHEN** user views the project detail page
 - **THEN** the form is full-width and the invoices table appears below the form
+

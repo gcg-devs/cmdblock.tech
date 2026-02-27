@@ -1,41 +1,52 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { verifySession } from "@/features/auth/lib";
-import { DashboardHeader } from "@/features/dashboard/components/dashboard-header";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "Dashboard — cmdblock.tech",
 };
 
 export default async function DashboardPage() {
-  const session = await verifySession();
-  if (!session) redirect("/login");
+  const [clientCount, projectCount, invoiceCount] = await Promise.all([
+    prisma.client.count(),
+    prisma.project.count(),
+    prisma.invoice.count(),
+  ]);
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.userId },
-    select: { displayName: true },
-  });
-
-  if (!user) redirect("/login");
+  const stats = [
+    { label: "Clients", value: clientCount },
+    { label: "Projects", value: projectCount },
+    { label: "Invoices", value: invoiceCount },
+  ];
 
   return (
-    <div className="min-h-screen">
-      <DashboardHeader displayName={user.displayName} />
+    <div className="max-w-6xl">
+      <div className="mb-8">
+        <p className="text-sm tracking-[0.3em] uppercase text-muted-foreground mb-2">
+          Overview
+        </p>
+        <h2 className="font-sans text-3xl font-700 tracking-tight">
+          <span className="text-muted-foreground font-mono text-xl font-normal">
+            &gt;_{" "}
+          </span>
+          dashboard
+        </h2>
+      </div>
 
-      <main className="px-6 md:px-16 lg:px-24 py-16">
-        <div className="max-w-4xl">
-          <p className="text-sm tracking-[0.3em] uppercase text-muted-foreground mb-6">
-            Welcome back
-          </p>
-          <h2 className="font-sans text-3xl sm:text-4xl font-700 tracking-tight mb-4">
-            {user.displayName}
-          </h2>
-          <p className="text-muted-foreground text-sm">
-            You&apos;re logged in to the cmdblock.tech internal dashboard.
-          </p>
-        </div>
-      </main>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {stats.map((stat) => (
+          <Card key={stat.label}>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xs tracking-[0.15em] uppercase text-muted-foreground font-mono font-normal">
+                {stat.label}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="font-sans text-3xl font-700">{stat.value}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 }

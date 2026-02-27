@@ -1,4 +1,8 @@
-## ADDED Requirements
+## Purpose
+
+Clickable table rows for navigation, entity deletion with cascade confirmation dialogs, and removal of the redundant invoice side-panel.
+
+## Requirements
 
 ### Requirement: Clickable table rows
 All entity list tables (clients, projects, invoices) SHALL make the entire row clickable. Clicking any cell in a row SHALL navigate to that entity's detail page.

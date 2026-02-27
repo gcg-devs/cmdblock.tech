@@ -25,7 +25,7 @@ Each LineItem SHALL have a `name` field (short label) in addition to the existin
 - **THEN** each line item shows the name as a bold header and the description below it
 
 ### Requirement: Invoice output shape
-The system SHALL provide a utility function that produces a structured JSON representation of an invoice including project scope, line items, client billing address, and payment protocol details.
+The system SHALL provide a utility function that produces a structured JSON representation of an invoice including project scope, line items, client billing address, payment protocol details, and share URL.
 
 #### Scenario: Generate output for project-linked invoice
 - **WHEN** the output function is called for an invoice linked to a project with showScopeOnInvoice=true
@@ -50,4 +50,12 @@ The system SHALL provide a utility function that produces a structured JSON repr
 #### Scenario: Generate output without payment protocol
 - **WHEN** the output function is called without a payment protocol
 - **THEN** the output includes `payment_protocol` as null
+
+#### Scenario: Generate output with share URL
+- **WHEN** the output function is called for an invoice with `isPublic = true` and a `shareToken`
+- **THEN** the output includes `share_url` containing the full public URL path
+
+#### Scenario: Generate output without share URL
+- **WHEN** the output function is called for an invoice without a share token or with `isPublic = false`
+- **THEN** the output includes `share_url` as null
 

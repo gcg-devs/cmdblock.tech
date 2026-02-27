@@ -16,6 +16,7 @@ import { InvoiceStatusControl } from "@/features/invoices/components/invoice-sta
 import { InvoiceForm } from "@/features/invoices/components/invoice-form";
 import { deleteInvoice } from "@/features/invoices/actions";
 import { DeleteEntityDialog } from "@/components/delete-entity-dialog";
+import { InvoiceShareButton } from "@/features/invoices/components/invoice-share-button";
 
 export default async function InvoiceDetailPage({
   params,
@@ -70,6 +71,11 @@ export default async function InvoiceDetailPage({
               Download PDF
             </Link>
           </Button>
+          <InvoiceShareButton
+            invoiceId={invoice.id}
+            shareToken={invoice.shareToken}
+            isPublic={invoice.isPublic}
+          />
           <InvoiceStatusControl
             invoiceId={invoice.id}
             currentStatus={invoice.status}
@@ -160,7 +166,7 @@ export default async function InvoiceDetailPage({
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+      <div className="space-y-10">
         <div>
           <h3 className="text-xs tracking-[0.15em] uppercase text-muted-foreground mb-4">
             Edit Invoice

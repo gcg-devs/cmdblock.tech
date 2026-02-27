@@ -7,7 +7,7 @@ type InvoiceWithRelations = Invoice & {
         client: Pick<Client, "name" | "billingAddress">;
       })
     | null;
-};
+} & Partial<Pick<Invoice, "shareToken" | "isPublic">>;
 
 export interface InvoiceOutputShape {
   soa_number: string;
@@ -41,6 +41,7 @@ export interface InvoiceOutputShape {
     account_name: string;
     account_number: string;
   } | null;
+  share_url: string | null;
 }
 
 export function buildInvoiceOutput(
@@ -87,5 +88,9 @@ export function buildInvoiceOutput(
           account_number: paymentProtocol.accountNumber,
         }
       : null,
+    share_url:
+      invoice.isPublic && invoice.shareToken
+        ? `/share/invoice/${invoice.shareToken}`
+        : null,
   };
 }

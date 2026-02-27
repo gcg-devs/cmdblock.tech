@@ -109,7 +109,7 @@ export default async function ProjectDetailPage({
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+      <div className="space-y-10">
         <div>
           <h3 className="text-xs tracking-[0.15em] uppercase text-muted-foreground mb-4">
             Edit Details

@@ -42,7 +42,7 @@ export async function createInvoice(
   if (!issueDate) return { error: "Issue date is required" };
   if (!dueDate) return { error: "Due date is required" };
 
-  let lineItems: { description: string; amount: number }[];
+  let lineItems: { name: string; description: string; amount: number }[];
   try {
     lineItems = JSON.parse(lineItemsJson || "[]");
   } catch {
@@ -71,6 +71,7 @@ export async function createInvoice(
       totalAmount,
       lineItems: {
         create: lineItems.map((li) => ({
+          name: (li.name || "").trim(),
           description: li.description.trim(),
           amount: li.amount,
         })),
@@ -91,6 +92,58 @@ export async function updateInvoiceStatus(id: string, status: InvoiceStatus) {
 
   revalidatePath(`/dashboard/invoices/${id}`);
   revalidatePath("/dashboard/invoices");
+}
+
+export async function updateInvoice(
+  id: string,
+  _prevState: InvoiceFormState,
+  formData: FormData
+): Promise<InvoiceFormState> {
+  const projectId = formData.get("projectId") as string;
+  const type = formData.get("type") as string;
+  const issueDate = formData.get("issueDate") as string;
+  const dueDate = formData.get("dueDate") as string;
+  const lineItemsJson = formData.get("lineItems") as string;
+
+  if (!issueDate) return { error: "Issue date is required" };
+  if (!dueDate) return { error: "Due date is required" };
+
+  let lineItems: { name: string; description: string; amount: number }[];
+  try {
+    lineItems = JSON.parse(lineItemsJson || "[]");
+  } catch {
+    return { error: "Invalid line items" };
+  }
+
+  if (lineItems.length === 0) {
+    return { error: "At least one line item is required" };
+  }
+
+  const totalAmount = lineItems.reduce((sum, li) => sum + (li.amount || 0), 0);
+  if (totalAmount <= 0) return { error: "Total amount must be greater than zero" };
+
+  await prisma.invoice.update({
+    where: { id },
+    data: {
+      projectId: projectId || null,
+      type: (type as "MOBILIZATION" | "MILESTONE" | "FINAL" | "ONE_OFF") || "ONE_OFF",
+      issueDate: new Date(issueDate),
+      dueDate: new Date(dueDate),
+      totalAmount,
+      lineItems: {
+        deleteMany: {},
+        create: lineItems.map((li) => ({
+          name: (li.name || "").trim(),
+          description: li.description.trim(),
+          amount: li.amount,
+        })),
+      },
+    },
+  });
+
+  revalidatePath(`/dashboard/invoices/${id}`);
+  revalidatePath("/dashboard/invoices");
+  redirect(`/dashboard/invoices/${id}`);
 }
 
 export async function deleteInvoice(id: string) {

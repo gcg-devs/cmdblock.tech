@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import { ProjectFinancialSummary } from "@/features/projects/components/project-financial-summary";
 import { ProjectStatusControl } from "@/features/projects/components/project-status-control";
+import { ProjectForm } from "@/features/projects/components/project-form";
 import { deleteProject } from "@/features/projects/actions";
 import { DeleteEntityDialog } from "@/components/delete-entity-dialog";
 
@@ -35,6 +36,11 @@ export default async function ProjectDetailPage({
   });
 
   if (!project) notFound();
+
+  const clients = await prisma.client.findMany({
+    orderBy: { name: "asc" },
+    select: { id: true, name: true },
+  });
 
   const invoiceCount = project.invoices.length;
   const deleteDesc = invoiceCount > 0
@@ -89,10 +95,43 @@ export default async function ProjectDetailPage({
         />
       </div>
 
-      <div>
-        <h3 className="text-xs tracking-[0.15em] uppercase text-muted-foreground mb-4">
-          Invoices ({project.invoices.length})
-        </h3>
+      {project.scopeDescription && (
+        <div className="mb-8">
+          <h3 className="text-xs tracking-[0.15em] uppercase text-muted-foreground mb-2">
+            Scope Description
+            {!project.showScopeOnInvoice && (
+              <span className="ml-2 text-muted-foreground/50">(hidden on invoices)</span>
+            )}
+          </h3>
+          <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+            {project.scopeDescription}
+          </p>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div>
+          <h3 className="text-xs tracking-[0.15em] uppercase text-muted-foreground mb-4">
+            Edit Details
+          </h3>
+          <ProjectForm
+            clients={clients}
+            project={{
+              id: project.id,
+              clientId: project.clientId,
+              title: project.title,
+              totalContractValue: project.totalContractValue,
+              currency: project.currency,
+              scopeDescription: project.scopeDescription,
+              showScopeOnInvoice: project.showScopeOnInvoice,
+            }}
+          />
+        </div>
+
+        <div>
+          <h3 className="text-xs tracking-[0.15em] uppercase text-muted-foreground mb-4">
+            Invoices ({project.invoices.length})
+          </h3>
         {project.invoices.length === 0 ? (
           <p className="text-sm text-muted-foreground">No invoices yet.</p>
         ) : (
@@ -135,6 +174,7 @@ export default async function ProjectDetailPage({
             </TableBody>
           </Table>
         )}
+        </div>
       </div>
     </div>
   );

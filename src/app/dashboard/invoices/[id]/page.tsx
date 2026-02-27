@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { InvoiceStatusControl } from "@/features/invoices/components/invoice-status-control";
+import { InvoiceForm } from "@/features/invoices/components/invoice-form";
 import { deleteInvoice } from "@/features/invoices/actions";
 import { DeleteEntityDialog } from "@/components/delete-entity-dialog";
 
@@ -23,27 +24,34 @@ export default async function InvoiceDetailPage({
 }) {
   const { id } = await params;
 
-  const invoice = await prisma.invoice.findUnique({
-    where: { id },
-    include: {
-      lineItems: true,
-      project: {
-        select: {
-          id: true,
-          title: true,
-          currency: true,
-          client: { select: { name: true } },
+  const [invoice, projects] = await Promise.all([
+    prisma.invoice.findUnique({
+      where: { id },
+      include: {
+        lineItems: true,
+        project: {
+          select: {
+            id: true,
+            title: true,
+            currency: true,
+            client: { select: { name: true } },
+          },
         },
       },
-    },
-  });
+    }),
+    prisma.project.findMany({
+      where: { status: "ACTIVE" },
+      orderBy: { createdAt: "desc" },
+      select: { id: true, title: true, client: { select: { name: true } } },
+    }),
+  ]);
 
   if (!invoice) notFound();
 
   const currencySymbol = invoice.project?.currency === "USD" ? "$" : "₱";
 
   return (
-    <div className="max-w-4xl animate-reveal reveal-delay-1">
+    <div className="max-w-6xl animate-reveal reveal-delay-1">
       <div className="flex items-center justify-between mb-8">
         <div>
           <p className="text-sm tracking-[0.3em] uppercase text-muted-foreground mb-2">
@@ -147,36 +155,68 @@ export default async function InvoiceDetailPage({
         </div>
       )}
 
-      <div>
-        <h3 className="text-xs tracking-[0.15em] uppercase text-muted-foreground mb-4">
-          Line Items
-        </h3>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Description</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {invoice.lineItems.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell>{item.description}</TableCell>
-                <TableCell className="text-right font-mono">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div>
+          <h3 className="text-xs tracking-[0.15em] uppercase text-muted-foreground mb-4">
+            Edit Invoice
+          </h3>
+          <InvoiceForm
+            projects={projects}
+            invoice={{
+              id: invoice.id,
+              projectId: invoice.projectId,
+              type: invoice.type,
+              issueDate: invoice.issueDate,
+              dueDate: invoice.dueDate,
+              lineItems: invoice.lineItems.map((li) => ({
+                name: li.name,
+                description: li.description,
+                amount: li.amount,
+              })),
+            }}
+          />
+        </div>
+
+        <div>
+          <h3 className="text-xs tracking-[0.15em] uppercase text-muted-foreground mb-4">
+            Line Items Summary
+          </h3>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Description</TableHead>
+                <TableHead className="text-right">Amount</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {invoice.lineItems.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell>
+                    {item.name && (
+                      <p className="font-medium">{item.name}</p>
+                    )}
+                    {item.description && (
+                      <p className="text-muted-foreground text-sm whitespace-pre-wrap">
+                        {item.description}
+                      </p>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right font-mono align-top">
+                    {currencySymbol}
+                    {item.amount.toLocaleString()}
+                  </TableCell>
+                </TableRow>
+              ))}
+              <TableRow className="border-t-2 border-foreground">
+                <TableCell className="font-bold">Total</TableCell>
+                <TableCell className="text-right font-mono font-bold">
                   {currencySymbol}
-                  {item.amount.toLocaleString()}
+                  {invoice.totalAmount.toLocaleString()}
                 </TableCell>
               </TableRow>
-            ))}
-            <TableRow className="border-t-2 border-foreground">
-              <TableCell className="font-bold">Total</TableCell>
-              <TableCell className="text-right font-mono font-bold">
-                {currencySymbol}
-                {invoice.totalAmount.toLocaleString()}
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );

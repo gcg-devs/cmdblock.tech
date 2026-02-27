@@ -21,24 +21,40 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { createInvoice, type InvoiceFormState } from "../actions";
+import { createInvoice, updateInvoice, type InvoiceFormState } from "../actions";
 import { LineItemEditor } from "./line-item-editor";
 
 interface InvoiceFormProps {
   projects: { id: string; title: string; client: { name: string } }[];
   defaultProjectId?: string;
+  invoice?: {
+    id: string;
+    projectId: string | null;
+    type: string;
+    issueDate: Date;
+    dueDate: Date;
+    lineItems: { name: string; description: string; amount: number }[];
+  };
 }
 
 const initialState: InvoiceFormState = {};
 
-export function InvoiceForm({ projects, defaultProjectId }: InvoiceFormProps) {
+export function InvoiceForm({ projects, defaultProjectId, invoice }: InvoiceFormProps) {
   const router = useRouter();
-  const [state, formAction, pending] = useActionState(createInvoice, initialState);
-  const [issueDate, setIssueDate] = useState<Date | undefined>(new Date());
-  const [dueDate, setDueDate] = useState<Date | undefined>();
-  const [lineItems, setLineItems] = useState([
-    { description: "", amount: 0 },
-  ]);
+  const action = invoice
+    ? updateInvoice.bind(null, invoice.id)
+    : createInvoice;
+  const [state, formAction, pending] = useActionState(action, initialState);
+  const [issueDate, setIssueDate] = useState<Date | undefined>(
+    invoice?.issueDate ?? new Date()
+  );
+  const [dueDate, setDueDate] = useState<Date | undefined>(
+    invoice?.dueDate ?? undefined
+  );
+  const [lineItems, setLineItems] = useState(
+    invoice?.lineItems.map((li) => ({ name: li.name, description: li.description, amount: li.amount }))
+      ?? [{ name: "", description: "", amount: 0 }]
+  );
 
   useEffect(() => {
     if (state.error) toast.error(state.error);
@@ -65,7 +81,7 @@ export function InvoiceForm({ projects, defaultProjectId }: InvoiceFormProps) {
           <Label className="text-xs tracking-[0.15em] uppercase">
             Project (optional)
           </Label>
-          <Select name="projectId" defaultValue={defaultProjectId}>
+          <Select name="projectId" defaultValue={invoice?.projectId ?? defaultProjectId}>
             <SelectTrigger className="bg-transparent">
               <SelectValue placeholder="Ad-hoc (no project)" />
             </SelectTrigger>
@@ -81,7 +97,7 @@ export function InvoiceForm({ projects, defaultProjectId }: InvoiceFormProps) {
 
         <div className="space-y-2">
           <Label className="text-xs tracking-[0.15em] uppercase">Type</Label>
-          <Select name="type" defaultValue="ONE_OFF">
+          <Select name="type" defaultValue={invoice?.type ?? "ONE_OFF"}>
             <SelectTrigger className="bg-transparent">
               <SelectValue />
             </SelectTrigger>
@@ -160,11 +176,13 @@ export function InvoiceForm({ projects, defaultProjectId }: InvoiceFormProps) {
 
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={pending}>
-          {pending ? "Creating..." : "Create Invoice"}
+          {pending ? "Saving..." : invoice ? "Update Invoice" : "Create Invoice"}
         </Button>
-        <Button type="button" variant="outline" onClick={() => router.back()}>
-          Cancel
-        </Button>
+        {!invoice && (
+          <Button type="button" variant="outline" onClick={() => router.back()}>
+            Cancel
+          </Button>
+        )}
       </div>
     </form>
   );

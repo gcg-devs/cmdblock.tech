@@ -7,6 +7,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -14,17 +16,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createProject, type ProjectFormState } from "../actions";
+import { createProject, updateProject, type ProjectFormState } from "../actions";
 
 interface ProjectFormProps {
   clients: { id: string; name: string }[];
+  project?: {
+    id: string;
+    clientId: string;
+    title: string;
+    totalContractValue: number;
+    currency: string;
+    scopeDescription: string;
+    showScopeOnInvoice: boolean;
+  };
 }
 
 const initialState: ProjectFormState = {};
 
-export function ProjectForm({ clients }: ProjectFormProps) {
+export function ProjectForm({ clients, project }: ProjectFormProps) {
   const router = useRouter();
-  const [state, formAction, pending] = useActionState(createProject, initialState);
+  const action = project
+    ? updateProject.bind(null, project.id)
+    : createProject;
+  const [state, formAction, pending] = useActionState(action, initialState);
 
   useEffect(() => {
     if (state.error) toast.error(state.error);
@@ -42,7 +56,7 @@ export function ProjectForm({ clients }: ProjectFormProps) {
         <Label htmlFor="clientId" className="text-xs tracking-[0.15em] uppercase">
           Client
         </Label>
-        <Select name="clientId" required>
+        <Select name="clientId" required defaultValue={project?.clientId}>
           <SelectTrigger className="bg-transparent">
             <SelectValue placeholder="Select a client" />
           </SelectTrigger>
@@ -64,6 +78,7 @@ export function ProjectForm({ clients }: ProjectFormProps) {
           id="title"
           name="title"
           required
+          defaultValue={project?.title}
           placeholder="e.g., Phase 1: Phantom Bridge Hotfix"
           className="bg-transparent"
         />
@@ -81,6 +96,7 @@ export function ProjectForm({ clients }: ProjectFormProps) {
             step="0.01"
             min="0"
             required
+            defaultValue={project?.totalContractValue}
             placeholder="190000"
             className="bg-transparent font-mono"
           />
@@ -90,7 +106,7 @@ export function ProjectForm({ clients }: ProjectFormProps) {
           <Label htmlFor="currency" className="text-xs tracking-[0.15em] uppercase">
             Currency
           </Label>
-          <Select name="currency" defaultValue="PHP">
+          <Select name="currency" defaultValue={project?.currency ?? "PHP"}>
             <SelectTrigger className="bg-transparent">
               <SelectValue />
             </SelectTrigger>
@@ -102,13 +118,39 @@ export function ProjectForm({ clients }: ProjectFormProps) {
         </div>
       </div>
 
+      <div className="space-y-2">
+        <Label htmlFor="scopeDescription" className="text-xs tracking-[0.15em] uppercase">
+          Scope Description
+        </Label>
+        <Textarea
+          id="scopeDescription"
+          name="scopeDescription"
+          defaultValue={project?.scopeDescription}
+          placeholder="e.g., Subcontracted technical services for the deployment of..."
+          className="bg-transparent min-h-[80px]"
+        />
+      </div>
+
+      <div className="flex items-center gap-3">
+        <Switch
+          id="showScopeOnInvoice"
+          name="showScopeOnInvoice"
+          defaultChecked={project?.showScopeOnInvoice ?? true}
+        />
+        <Label htmlFor="showScopeOnInvoice" className="text-xs tracking-[0.15em] uppercase">
+          Show Scope on Invoice
+        </Label>
+      </div>
+
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={pending}>
-          {pending ? "Creating..." : "Create Project"}
+          {pending ? "Saving..." : project ? "Update Project" : "Create Project"}
         </Button>
-        <Button type="button" variant="outline" onClick={() => router.back()}>
-          Cancel
-        </Button>
+        {!project && (
+          <Button type="button" variant="outline" onClick={() => router.back()}>
+            Cancel
+          </Button>
+        )}
       </div>
     </form>
   );

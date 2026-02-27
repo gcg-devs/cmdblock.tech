@@ -18,6 +18,8 @@ export async function createProject(
   const title = formData.get("title") as string;
   const totalContractValue = parseFloat(formData.get("totalContractValue") as string);
   const currency = formData.get("currency") as string;
+  const scopeDescription = (formData.get("scopeDescription") as string) || "";
+  const showScopeOnInvoice = formData.get("showScopeOnInvoice") === "on";
 
   if (!clientId?.trim()) return { error: "Client is required" };
   if (!title?.trim()) return { error: "Project title is required" };
@@ -31,6 +33,8 @@ export async function createProject(
       title: title.trim(),
       totalContractValue,
       currency: currency === "USD" ? "USD" : "PHP",
+      scopeDescription: scopeDescription.trim(),
+      showScopeOnInvoice,
     },
   });
 
@@ -49,6 +53,41 @@ export async function updateProjectStatus(
 
   revalidatePath(`/dashboard/projects/${id}`);
   revalidatePath("/dashboard/projects");
+}
+
+export async function updateProject(
+  id: string,
+  _prevState: ProjectFormState,
+  formData: FormData
+): Promise<ProjectFormState> {
+  const clientId = formData.get("clientId") as string;
+  const title = formData.get("title") as string;
+  const totalContractValue = parseFloat(formData.get("totalContractValue") as string);
+  const currency = formData.get("currency") as string;
+  const scopeDescription = (formData.get("scopeDescription") as string) || "";
+  const showScopeOnInvoice = formData.get("showScopeOnInvoice") === "on";
+
+  if (!clientId?.trim()) return { error: "Client is required" };
+  if (!title?.trim()) return { error: "Project title is required" };
+  if (isNaN(totalContractValue) || totalContractValue <= 0) {
+    return { error: "Valid contract value is required" };
+  }
+
+  await prisma.project.update({
+    where: { id },
+    data: {
+      clientId,
+      title: title.trim(),
+      totalContractValue,
+      currency: currency === "USD" ? "USD" : "PHP",
+      scopeDescription: scopeDescription.trim(),
+      showScopeOnInvoice,
+    },
+  });
+
+  revalidatePath(`/dashboard/projects/${id}`);
+  revalidatePath("/dashboard/projects");
+  redirect(`/dashboard/projects/${id}`);
 }
 
 export async function deleteProject(id: string) {

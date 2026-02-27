@@ -50,3 +50,9 @@ export async function updateProjectStatus(
   revalidatePath(`/dashboard/projects/${id}`);
   revalidatePath("/dashboard/projects");
 }
+
+export async function deleteProject(id: string) {
+  await prisma.project.delete({ where: { id } });
+  revalidatePath("/dashboard/projects");
+  redirect("/dashboard/projects");
+}

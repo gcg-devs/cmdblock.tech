@@ -13,6 +13,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { InvoiceStatusControl } from "@/features/invoices/components/invoice-status-control";
+import { deleteInvoice } from "@/features/invoices/actions";
+import { DeleteEntityDialog } from "@/components/delete-entity-dialog";
 
 export default async function InvoiceDetailPage({
   params,
@@ -58,6 +60,10 @@ export default async function InvoiceDetailPage({
           <InvoiceStatusControl
             invoiceId={invoice.id}
             currentStatus={invoice.status}
+          />
+          <DeleteEntityDialog
+            entityName="Invoice"
+            onDelete={deleteInvoice.bind(null, invoice.id)}
           />
         </div>
       </div>

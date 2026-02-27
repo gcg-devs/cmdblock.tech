@@ -3,6 +3,8 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import { ClientForm } from "@/features/clients/components/client-form";
+import { deleteClient } from "@/features/clients/actions";
+import { DeleteEntityDialog } from "@/components/delete-entity-dialog";
 import {
   Table,
   TableBody,
@@ -38,6 +40,15 @@ export default async function ClientDetailPage({
 
   if (!client) notFound();
 
+  const projectCount = client.projects.length;
+  const invoiceCount = await prisma.invoice.count({
+    where: { project: { clientId: id } },
+  });
+
+  const deleteDesc = projectCount > 0
+    ? `This will permanently delete this client, ${projectCount} project(s), and ${invoiceCount} invoice(s). This action cannot be undone.`
+    : undefined;
+
   return (
     <div className="max-w-6xl animate-reveal reveal-delay-1">
       <div className="flex items-center justify-between mb-8">
@@ -52,9 +63,16 @@ export default async function ClientDetailPage({
             {client.name}
           </h2>
         </div>
-        <Button variant="outline" asChild>
-          <Link href="/dashboard/clients">Back</Link>
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button variant="outline" asChild>
+            <Link href="/dashboard/clients">Back</Link>
+          </Button>
+          <DeleteEntityDialog
+            entityName="Client"
+            description={deleteDesc}
+            onDelete={deleteClient.bind(null, client.id)}
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">

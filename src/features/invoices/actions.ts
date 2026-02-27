@@ -92,3 +92,9 @@ export async function updateInvoiceStatus(id: string, status: InvoiceStatus) {
   revalidatePath(`/dashboard/invoices/${id}`);
   revalidatePath("/dashboard/invoices");
 }
+
+export async function deleteInvoice(id: string) {
+  await prisma.invoice.delete({ where: { id } });
+  revalidatePath("/dashboard/invoices");
+  redirect("/dashboard/invoices");
+}

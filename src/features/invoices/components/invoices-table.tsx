@@ -1,6 +1,4 @@
-"use client";
-
-import { useState } from "react";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -10,23 +8,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { InvoiceDetailPanel } from "./invoice-detail-panel";
-
-interface LineItem {
-  id: string;
-  description: string;
-  amount: number;
-}
 
 interface InvoiceRow {
   id: string;
   invoiceNumber: string;
   type: string;
   status: "DRAFT" | "SENT" | "PAID" | "OVERDUE";
-  issueDate: string;
-  dueDate: string;
+  issueDate: Date;
+  dueDate: Date;
   totalAmount: number;
-  lineItems: LineItem[];
   project: {
     id: string;
     title: string;
@@ -51,16 +41,6 @@ function statusVariant(status: string) {
 }
 
 export function InvoicesTable({ invoices }: InvoicesTableProps) {
-  const [selectedInvoice, setSelectedInvoice] = useState<InvoiceRow | null>(
-    null
-  );
-  const [panelOpen, setPanelOpen] = useState(false);
-
-  function handleRowClick(invoice: InvoiceRow) {
-    setSelectedInvoice(invoice);
-    setPanelOpen(true);
-  }
-
   if (invoices.length === 0) {
     return (
       <p className="text-sm text-muted-foreground py-8 text-center">
@@ -70,58 +50,83 @@ export function InvoicesTable({ invoices }: InvoicesTableProps) {
   }
 
   return (
-    <>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Invoice #</TableHead>
-            <TableHead>Client / Project</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Issue Date</TableHead>
-            <TableHead>Due Date</TableHead>
-            <TableHead className="text-right">Amount</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {invoices.map((inv) => (
-            <TableRow
-              key={inv.id}
-              className="cursor-pointer hover:bg-muted/50 transition-colors"
-              onClick={() => handleRowClick(inv)}
-            >
-              <TableCell className="font-mono font-medium">
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Invoice #</TableHead>
+          <TableHead>Client / Project</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead>Issue Date</TableHead>
+          <TableHead>Due Date</TableHead>
+          <TableHead className="text-right">Amount</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {invoices.map((inv) => (
+          <TableRow key={inv.id} className="group">
+            <TableCell className="p-0">
+              <Link
+                href={`/dashboard/invoices/${inv.id}`}
+                className="flex items-center px-4 py-2 font-mono font-medium group-hover:bg-muted/50 transition-colors"
+              >
                 {inv.invoiceNumber}
-              </TableCell>
-              <TableCell className="text-muted-foreground">
+              </Link>
+            </TableCell>
+            <TableCell className="p-0">
+              <Link
+                href={`/dashboard/invoices/${inv.id}`}
+                className="flex items-center px-4 py-2 text-muted-foreground group-hover:bg-muted/50 transition-colors"
+              >
                 {inv.project
                   ? `${inv.project.client.name} — ${inv.project.title}`
                   : "Ad-hoc"}
-              </TableCell>
-              <TableCell className="text-muted-foreground">{inv.type}</TableCell>
-              <TableCell>
+              </Link>
+            </TableCell>
+            <TableCell className="p-0">
+              <Link
+                href={`/dashboard/invoices/${inv.id}`}
+                className="flex items-center px-4 py-2 text-muted-foreground group-hover:bg-muted/50 transition-colors"
+              >
+                {inv.type}
+              </Link>
+            </TableCell>
+            <TableCell className="p-0">
+              <Link
+                href={`/dashboard/invoices/${inv.id}`}
+                className="flex items-center px-4 py-2 group-hover:bg-muted/50 transition-colors"
+              >
                 <Badge variant={statusVariant(inv.status)}>{inv.status}</Badge>
-              </TableCell>
-              <TableCell className="text-muted-foreground">
-                {new Date(inv.issueDate).toLocaleDateString()}
-              </TableCell>
-              <TableCell className="text-muted-foreground">
-                {new Date(inv.dueDate).toLocaleDateString()}
-              </TableCell>
-              <TableCell className="text-right font-mono text-sm">
+              </Link>
+            </TableCell>
+            <TableCell className="p-0">
+              <Link
+                href={`/dashboard/invoices/${inv.id}`}
+                className="flex items-center px-4 py-2 text-muted-foreground group-hover:bg-muted/50 transition-colors"
+              >
+                {inv.issueDate.toLocaleDateString()}
+              </Link>
+            </TableCell>
+            <TableCell className="p-0">
+              <Link
+                href={`/dashboard/invoices/${inv.id}`}
+                className="flex items-center px-4 py-2 text-muted-foreground group-hover:bg-muted/50 transition-colors"
+              >
+                {inv.dueDate.toLocaleDateString()}
+              </Link>
+            </TableCell>
+            <TableCell className="p-0">
+              <Link
+                href={`/dashboard/invoices/${inv.id}`}
+                className="flex items-center justify-end px-4 py-2 font-mono text-sm group-hover:bg-muted/50 transition-colors"
+              >
                 {inv.project?.currency === "USD" ? "$" : "₱"}
                 {inv.totalAmount.toLocaleString()}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-
-      <InvoiceDetailPanel
-        invoice={selectedInvoice}
-        open={panelOpen}
-        onOpenChange={setPanelOpen}
-      />
-    </>
+              </Link>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 }

@@ -7,7 +7,6 @@ export default async function InvoicesPage() {
   const invoices = await prisma.invoice.findMany({
     orderBy: { createdAt: "desc" },
     include: {
-      lineItems: true,
       project: {
         select: {
           id: true,
@@ -18,14 +17,6 @@ export default async function InvoicesPage() {
       },
     },
   });
-
-  const serialized = invoices.map((inv) => ({
-    ...inv,
-    issueDate: inv.issueDate.toISOString(),
-    dueDate: inv.dueDate.toISOString(),
-    createdAt: inv.createdAt.toISOString(),
-    updatedAt: inv.updatedAt.toISOString(),
-  }));
 
   return (
     <div className="max-w-6xl animate-reveal reveal-delay-1">
@@ -46,7 +37,7 @@ export default async function InvoicesPage() {
         </Button>
       </div>
 
-      <InvoicesTable invoices={serialized} />
+      <InvoicesTable invoices={invoices} />
     </div>
   );
 }

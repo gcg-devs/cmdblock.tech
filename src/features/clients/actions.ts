@@ -69,3 +69,9 @@ export async function updateClient(
   revalidatePath("/dashboard/clients");
   redirect(`/dashboard/clients/${id}`);
 }
+
+export async function deleteClient(id: string) {
+  await prisma.client.delete({ where: { id } });
+  revalidatePath("/dashboard/clients");
+  redirect("/dashboard/clients");
+}

@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/table";
 import { ProjectFinancialSummary } from "@/features/projects/components/project-financial-summary";
 import { ProjectStatusControl } from "@/features/projects/components/project-status-control";
+import { deleteProject } from "@/features/projects/actions";
+import { DeleteEntityDialog } from "@/components/delete-entity-dialog";
 
 export default async function ProjectDetailPage({
   params,
@@ -33,6 +35,11 @@ export default async function ProjectDetailPage({
   });
 
   if (!project) notFound();
+
+  const invoiceCount = project.invoices.length;
+  const deleteDesc = invoiceCount > 0
+    ? `This will permanently delete this project and ${invoiceCount} invoice(s). This action cannot be undone.`
+    : undefined;
 
   const amountBilled = project.invoices.reduce((sum, inv) => sum + inv.totalAmount, 0);
   const amountCollected = project.invoices
@@ -65,6 +72,11 @@ export default async function ProjectDetailPage({
               + Generate SOA
             </Link>
           </Button>
+          <DeleteEntityDialog
+            entityName="Project"
+            description={deleteDesc}
+            onDelete={deleteProject.bind(null, project.id)}
+          />
         </div>
       </div>
 

@@ -41,23 +41,38 @@ export function ClientsTable({ clients }: ClientsTableProps) {
       </TableHeader>
       <TableBody>
         {clients.map((client) => (
-          <TableRow key={client.id}>
-            <TableCell>
+          <TableRow key={client.id} className="group">
+            <TableCell className="p-0">
               <Link
                 href={`/dashboard/clients/${client.id}`}
-                className="hover:underline font-medium"
+                className="flex items-center px-4 py-2 font-medium group-hover:bg-muted/50 transition-colors"
               >
                 {client.name}
               </Link>
             </TableCell>
-            <TableCell className="text-muted-foreground">
-              {client.pocName}
+            <TableCell className="p-0">
+              <Link
+                href={`/dashboard/clients/${client.id}`}
+                className="flex items-center px-4 py-2 text-muted-foreground group-hover:bg-muted/50 transition-colors"
+              >
+                {client.pocName}
+              </Link>
             </TableCell>
-            <TableCell className="text-muted-foreground">
-              {client.pocEmail}
+            <TableCell className="p-0">
+              <Link
+                href={`/dashboard/clients/${client.id}`}
+                className="flex items-center px-4 py-2 text-muted-foreground group-hover:bg-muted/50 transition-colors"
+              >
+                {client.pocEmail}
+              </Link>
             </TableCell>
-            <TableCell className="text-muted-foreground">
-              {client.createdAt.toLocaleDateString()}
+            <TableCell className="p-0">
+              <Link
+                href={`/dashboard/clients/${client.id}`}
+                className="flex items-center px-4 py-2 text-muted-foreground group-hover:bg-muted/50 transition-colors"
+              >
+                {client.createdAt.toLocaleDateString()}
+              </Link>
             </TableCell>
           </TableRow>
         ))}

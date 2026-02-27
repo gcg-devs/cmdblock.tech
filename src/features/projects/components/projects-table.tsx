@@ -49,27 +49,47 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
       </TableHeader>
       <TableBody>
         {projects.map((project) => (
-          <TableRow key={project.id}>
-            <TableCell>
+          <TableRow key={project.id} className="group">
+            <TableCell className="p-0">
               <Link
                 href={`/dashboard/projects/${project.id}`}
-                className="hover:underline font-medium"
+                className="flex items-center px-4 py-2 font-medium group-hover:bg-muted/50 transition-colors"
               >
                 {project.title}
               </Link>
             </TableCell>
-            <TableCell className="text-muted-foreground">
-              {project.client.name}
+            <TableCell className="p-0">
+              <Link
+                href={`/dashboard/projects/${project.id}`}
+                className="flex items-center px-4 py-2 text-muted-foreground group-hover:bg-muted/50 transition-colors"
+              >
+                {project.client.name}
+              </Link>
             </TableCell>
-            <TableCell>
-              <Badge variant="outline">{project.status}</Badge>
+            <TableCell className="p-0">
+              <Link
+                href={`/dashboard/projects/${project.id}`}
+                className="flex items-center px-4 py-2 group-hover:bg-muted/50 transition-colors"
+              >
+                <Badge variant="outline">{project.status}</Badge>
+              </Link>
             </TableCell>
-            <TableCell className="text-right font-mono text-sm">
-              {currencySymbol(project.currency)}
-              {project.totalContractValue.toLocaleString()}
+            <TableCell className="p-0">
+              <Link
+                href={`/dashboard/projects/${project.id}`}
+                className="flex items-center justify-end px-4 py-2 font-mono text-sm group-hover:bg-muted/50 transition-colors"
+              >
+                {currencySymbol(project.currency)}
+                {project.totalContractValue.toLocaleString()}
+              </Link>
             </TableCell>
-            <TableCell className="text-right text-muted-foreground">
-              {project._count.invoices}
+            <TableCell className="p-0">
+              <Link
+                href={`/dashboard/projects/${project.id}`}
+                className="flex items-center justify-end px-4 py-2 text-muted-foreground group-hover:bg-muted/50 transition-colors"
+              >
+                {project._count.invoices}
+              </Link>
             </TableCell>
           </TableRow>
         ))}

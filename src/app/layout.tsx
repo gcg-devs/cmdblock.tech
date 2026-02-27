@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Syne } from "next/font/google";
 import { Geist_Mono } from "next/font/google";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const syne = Syne({
@@ -31,6 +32,20 @@ export default function RootLayout({
         className={`${syne.variable} ${geistMono.variable} font-mono antialiased`}
       >
         {children}
+        <Toaster
+          theme="dark"
+          position="bottom-right"
+          toastOptions={{
+            style: {
+              background: "#0a0a0a",
+              border: "1px solid rgba(255, 255, 255, 0.12)",
+              borderRadius: "0px",
+              color: "#ffffff",
+              fontFamily: "var(--font-geist-mono)",
+              fontSize: "13px",
+            },
+          }}
+        />
       </body>
     </html>
   );

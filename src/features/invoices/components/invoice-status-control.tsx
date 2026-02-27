@@ -1,5 +1,7 @@
 "use client";
 
+import { useOptimistic, useTransition } from "react";
+import { toast } from "sonner";
 import {
   Select,
   SelectContent,
@@ -26,13 +28,20 @@ export function InvoiceStatusControl({
   invoiceId,
   currentStatus,
 }: InvoiceStatusControlProps) {
+  const [optimisticStatus, setOptimisticStatus] = useOptimistic(currentStatus);
+  const [, startTransition] = useTransition();
+
+  function handleChange(value: string) {
+    const newStatus = value as InvoiceStatus;
+    startTransition(async () => {
+      setOptimisticStatus(newStatus);
+      await updateInvoiceStatus(invoiceId, newStatus);
+      toast.success(`Invoice marked as ${statuses.find((s) => s.value === newStatus)?.label}`);
+    });
+  }
+
   return (
-    <Select
-      defaultValue={currentStatus}
-      onValueChange={(value) =>
-        updateInvoiceStatus(invoiceId, value as InvoiceStatus)
-      }
-    >
+    <Select value={optimisticStatus} onValueChange={handleChange}>
       <SelectTrigger className="w-[140px] bg-transparent">
         <SelectValue />
       </SelectTrigger>

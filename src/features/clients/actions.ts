@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 
 export type ClientFormState = {
   error?: string;
+  success?: string;
 };
 
 export async function createClient(

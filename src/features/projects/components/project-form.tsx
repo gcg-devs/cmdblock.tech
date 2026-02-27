@@ -1,6 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
 import { useActionState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,7 +23,12 @@ interface ProjectFormProps {
 const initialState: ProjectFormState = {};
 
 export function ProjectForm({ clients }: ProjectFormProps) {
+  const router = useRouter();
   const [state, formAction, pending] = useActionState(createProject, initialState);
+
+  useEffect(() => {
+    if (state.error) toast.error(state.error);
+  }, [state]);
 
   return (
     <form action={formAction} className="space-y-6 max-w-lg">
@@ -94,9 +102,14 @@ export function ProjectForm({ clients }: ProjectFormProps) {
         </div>
       </div>
 
-      <Button type="submit" disabled={pending}>
-        {pending ? "Creating..." : "Create Project"}
-      </Button>
+      <div className="flex items-center gap-3">
+        <Button type="submit" disabled={pending}>
+          {pending ? "Creating..." : "Create Project"}
+        </Button>
+        <Button type="button" variant="outline" onClick={() => router.back()}>
+          Cancel
+        </Button>
+      </div>
     </form>
   );
 }

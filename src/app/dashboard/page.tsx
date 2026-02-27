@@ -20,7 +20,7 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <div className="max-w-6xl">
+    <div className="max-w-6xl animate-reveal reveal-delay-1">
       <div className="mb-8">
         <p className="text-sm tracking-[0.3em] uppercase text-muted-foreground mb-2">
           Overview

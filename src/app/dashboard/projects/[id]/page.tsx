@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -41,14 +40,7 @@ export default async function ProjectDetailPage({
     .reduce((sum, inv) => sum + inv.totalAmount, 0);
 
   return (
-    <div className="max-w-6xl">
-      <Link
-        href="/dashboard/projects"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back
-      </Link>
+    <div className="max-w-6xl animate-reveal reveal-delay-1">
       <div className="flex items-center justify-between mb-8">
         <div>
           <p className="text-sm tracking-[0.3em] uppercase text-muted-foreground mb-2">
@@ -64,6 +56,9 @@ export default async function ProjectDetailPage({
           </h2>
         </div>
         <div className="flex items-center gap-3">
+          <Button variant="outline" asChild>
+            <Link href="/dashboard/projects">Back</Link>
+          </Button>
           <ProjectStatusControl projectId={project.id} currentStatus={project.status} />
           <Button asChild>
             <Link href={`/dashboard/invoices/new?projectId=${project.id}`}>

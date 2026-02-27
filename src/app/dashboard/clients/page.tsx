@@ -9,7 +9,7 @@ export default async function ClientsPage() {
   });
 
   return (
-    <div className="max-w-6xl">
+    <div className="max-w-6xl animate-reveal reveal-delay-1">
       <div className="flex items-center justify-between mb-8">
         <div>
           <p className="text-sm tracking-[0.3em] uppercase text-muted-foreground mb-2">

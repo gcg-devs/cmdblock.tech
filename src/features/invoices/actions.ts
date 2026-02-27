@@ -7,6 +7,7 @@ import type { InvoiceStatus } from "@/generated/prisma/client";
 
 export type InvoiceFormState = {
   error?: string;
+  success?: string;
 };
 
 async function generateInvoiceNumber(): Promise<string> {

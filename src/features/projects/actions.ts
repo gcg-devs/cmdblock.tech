@@ -7,6 +7,7 @@ import type { ProjectStatus } from "@/generated/prisma/client";
 
 export type ProjectFormState = {
   error?: string;
+  success?: string;
 };
 
 export async function createProject(

@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { Button } from "@/components/ui/button";
 import { ClientForm } from "@/features/clients/components/client-form";
 import {
   Table,
@@ -39,24 +39,22 @@ export default async function ClientDetailPage({
   if (!client) notFound();
 
   return (
-    <div className="max-w-6xl">
-      <Link
-        href="/dashboard/clients"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back
-      </Link>
-      <div className="mb-8">
-        <p className="text-sm tracking-[0.3em] uppercase text-muted-foreground mb-2">
-          Client
-        </p>
-        <h2 className="font-sans text-2xl font-700 tracking-tight">
-          <span className="text-muted-foreground font-mono text-lg font-normal">
-            &gt;_{" "}
-          </span>
-          {client.name}
-        </h2>
+    <div className="max-w-6xl animate-reveal reveal-delay-1">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <p className="text-sm tracking-[0.3em] uppercase text-muted-foreground mb-2">
+            Client
+          </p>
+          <h2 className="font-sans text-2xl font-700 tracking-tight">
+            <span className="text-muted-foreground font-mono text-lg font-normal">
+              &gt;_{" "}
+            </span>
+            {client.name}
+          </h2>
+        </div>
+        <Button variant="outline" asChild>
+          <Link href="/dashboard/clients">Back</Link>
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">

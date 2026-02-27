@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useActionState } from "react";
+import { useState, useEffect, useActionState } from "react";
+import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
@@ -30,12 +32,17 @@ interface InvoiceFormProps {
 const initialState: InvoiceFormState = {};
 
 export function InvoiceForm({ projects, defaultProjectId }: InvoiceFormProps) {
+  const router = useRouter();
   const [state, formAction, pending] = useActionState(createInvoice, initialState);
   const [issueDate, setIssueDate] = useState<Date | undefined>(new Date());
   const [dueDate, setDueDate] = useState<Date | undefined>();
   const [lineItems, setLineItems] = useState([
     { description: "", amount: 0 },
   ]);
+
+  useEffect(() => {
+    if (state.error) toast.error(state.error);
+  }, [state]);
 
   return (
     <form
@@ -151,9 +158,14 @@ export function InvoiceForm({ projects, defaultProjectId }: InvoiceFormProps) {
         <LineItemEditor value={lineItems} onChange={setLineItems} />
       </div>
 
-      <Button type="submit" disabled={pending}>
-        {pending ? "Creating..." : "Create Invoice"}
-      </Button>
+      <div className="flex items-center gap-3">
+        <Button type="submit" disabled={pending}>
+          {pending ? "Creating..." : "Create Invoice"}
+        </Button>
+        <Button type="button" variant="outline" onClick={() => router.back()}>
+          Cancel
+        </Button>
+      </div>
     </form>
   );
 }

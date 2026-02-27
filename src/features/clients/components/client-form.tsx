@@ -1,6 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
 import { useActionState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,11 +23,16 @@ interface ClientFormProps {
 const initialState: ClientFormState = {};
 
 export function ClientForm({ client }: ClientFormProps) {
+  const router = useRouter();
   const action = client
     ? updateClient.bind(null, client.id)
     : createClient;
 
   const [state, formAction, pending] = useActionState(action, initialState);
+
+  useEffect(() => {
+    if (state.error) toast.error(state.error);
+  }, [state]);
 
   return (
     <form action={formAction} className="space-y-6 max-w-lg">
@@ -91,9 +99,16 @@ export function ClientForm({ client }: ClientFormProps) {
         />
       </div>
 
-      <Button type="submit" disabled={pending}>
-        {pending ? "Saving..." : client ? "Update Client" : "Create Client"}
-      </Button>
+      <div className="flex items-center gap-3">
+        <Button type="submit" disabled={pending}>
+          {pending ? "Saving..." : client ? "Update Client" : "Create Client"}
+        </Button>
+        {!client && (
+          <Button type="button" variant="outline" onClick={() => router.back()}>
+            Cancel
+          </Button>
+        )}
+      </div>
     </form>
   );
 }

@@ -65,6 +65,11 @@ export default async function InvoiceDetailPage({
           <Button variant="outline" asChild>
             <Link href="/dashboard/invoices">Back</Link>
           </Button>
+          <Button variant="outline" asChild>
+            <Link href={`/dashboard/invoices/${invoice.id}/pdf`}>
+              Download PDF
+            </Link>
+          </Button>
           <InvoiceStatusControl
             invoiceId={invoice.id}
             currentStatus={invoice.status}

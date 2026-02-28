@@ -63,21 +63,9 @@ export function SharedInvoiceView({
         : "outline";
 
   return (
-    <div className="flex gap-6 p-6 max-w-[1200px] mx-auto">
-      {/* Main: Invoice Preview */}
-      <div className="flex-1 min-w-0">
-        <div
-          className="bg-white shadow-lg border border-border mx-auto"
-          style={{ maxWidth: "960px" }}
-        >
-          <div style={{ borderTop: "8px solid #0a0a0a" }}>
-            <InvoiceHtmlTemplate data={invoiceData} />
-          </div>
-        </div>
-      </div>
-
-      {/* Sidebar: Details */}
-      <div className="w-72 shrink-0 space-y-4">
+    <div className="flex flex-col md:flex-row gap-6 p-6 max-w-[1200px] mx-auto">
+      {/* Sidebar: Details (shown first on mobile) */}
+      <div className="w-full md:w-72 md:shrink-0 space-y-4 order-1 md:order-2">
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-xs tracking-[0.15em] uppercase text-muted-foreground font-mono font-normal">
@@ -136,6 +124,18 @@ export function SharedInvoiceView({
           <Download className="h-4 w-4 mr-2" />
           {downloading ? "Generating..." : "Download PDF"}
         </Button>
+      </div>
+
+      {/* Main: Invoice Preview (hidden on mobile) */}
+      <div className="hidden md:block flex-1 min-w-0 order-2 md:order-1">
+        <div
+          className="bg-white shadow-lg border border-border mx-auto"
+          style={{ maxWidth: "960px" }}
+        >
+          <div style={{ borderTop: "8px solid #0a0a0a" }}>
+            <InvoiceHtmlTemplate data={invoiceData} />
+          </div>
+        </div>
       </div>
     </div>
   );

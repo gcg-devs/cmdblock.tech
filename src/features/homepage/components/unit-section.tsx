@@ -3,10 +3,10 @@ import { Reveal } from "./reveal";
 const members = [
   {
     name: "Ghegi",
-    role: "Application & Interactive Systems Lead",
+    role: "Applications, Infrastructure & DevOps Lead",
     tag: "The Engine",
     description:
-      "Thrives on high-velocity pattern recognition and complex logic execution. Specializing in Web Applications (React/Next.js & .NET) and Game Development (Unity) — the bridge between heavy backend architecture and highly interactive, user-facing experiences.",
+      "Thrives on high-velocity pattern recognition and complex logic execution. Specializing in full-stack web applications, cloud infrastructure, and CI/CD pipelines — the bridge between heavy backend architecture, deployment operations, and highly interactive, user-facing experiences. Knows every layer of the stack from container orchestration to pixel-perfect UI.",
   },
   {
     name: "Gudo",

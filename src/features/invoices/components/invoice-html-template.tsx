@@ -13,8 +13,8 @@ function formatAmount(amount: number, currency: string): string {
   return `${symbol} ${amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
-const mono = "'Fira Code', 'Geist Mono', monospace";
-const sans = "'Inter', 'Segoe UI', system-ui, sans-serif";
+const mono = "'Geist Mono', var(--font-geist-mono), monospace";
+const sans = "'Syne', var(--font-syne), system-ui, sans-serif";
 
 const label: React.CSSProperties = {
   fontSize: "10px",

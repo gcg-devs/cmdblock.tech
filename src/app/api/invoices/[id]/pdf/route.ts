@@ -3,9 +3,8 @@ import { createElement } from "react";
 import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
-import { generatePdf } from "@/lib/pdf";
 import { buildInvoiceOutput } from "@/features/invoices/lib/invoice-output";
-import { InvoiceHtmlTemplate } from "@/features/invoices/components/invoice-html-template";
+import { InvoicePdfDocument } from "@/features/invoices/components/invoice-pdf-document";
 
 function getSecret() {
   const secret = process.env.AUTH_SECRET;
@@ -81,14 +80,11 @@ export async function GET(
 
   const invoiceData = buildInvoiceOutput(invoice, protocol, teamProfile);
 
-  // Dynamic import to bypass Next.js static analysis restriction on react-dom/server
-  const { renderToStaticMarkup } = await import("react-dom/server");
-  const templateHtml = renderToStaticMarkup(
-    createElement(InvoiceHtmlTemplate, { data: invoiceData })
-  );
-
   try {
-    const pdfBuffer = await generatePdf(templateHtml);
+    const { renderToBuffer } = await import("@react-pdf/renderer");
+    const pdfBuffer = await renderToBuffer(
+      createElement(InvoicePdfDocument, { data: invoiceData }) as any
+    );
 
     return new NextResponse(new Uint8Array(pdfBuffer), {
       headers: {
@@ -99,8 +95,8 @@ export async function GET(
   } catch (error) {
     console.error("PDF generation error:", error);
     return NextResponse.json(
-      { error: "PDF generation failed. Ensure the Chromium service is running." },
-      { status: 503 }
+      { error: "PDF generation failed" },
+      { status: 500 }
     );
   }
 }

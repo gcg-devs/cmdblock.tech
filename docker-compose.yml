@@ -10,4 +10,16 @@ services:
     environment:
       - NODE_ENV=production
       - DATABASE_URL=${DATABASE_URL}
+      - AUTH_SECRET=${AUTH_SECRET}
+      - CHROMIUM_URL=ws://chromium:3000/chromium
+    depends_on:
+      - chromium
+    restart: always
+
+  chromium:
+    image: ghcr.io/browserless/chromium
+    environment:
+      - TOKEN=
+      - TIMEOUT=60000
+      - CONCURRENT=5
     restart: always

@@ -82,5 +82,5 @@ export default async function SharedInvoicePage({
 
   const invoiceData = buildInvoiceOutput(invoice, protocol, teamProfile);
 
-  return <SharedInvoiceView invoiceData={invoiceData} />;
+  return <SharedInvoiceView invoiceData={invoiceData} invoiceId={invoice.id} shareToken={shareToken} />;
 }

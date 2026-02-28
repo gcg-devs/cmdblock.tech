@@ -1,9 +1,7 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
-import html2canvas from "html2canvas";
-import { jsPDF } from "jspdf";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -13,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { InvoiceHtmlTemplate } from "./invoice-html-template";
-import { buildInvoiceOutput, type InvoiceOutputShape } from "../lib/invoice-output";
+import type { InvoiceOutputShape } from "../lib/invoice-output";
 
 interface PaymentProtocolOption {
   id: string;
@@ -41,7 +39,6 @@ export function InvoicePdfPreview({
     defaultProtocol?.id ?? ""
   );
   const [downloading, setDownloading] = useState(false);
-  const templateRef = useRef<HTMLDivElement>(null);
 
   const selectedProtocol = protocols.find((p) => p.id === selectedProtocolId);
 
@@ -58,46 +55,27 @@ export function InvoicePdfPreview({
   };
 
   const handleDownload = useCallback(async () => {
-    if (!templateRef.current) return;
     setDownloading(true);
-
     try {
-      const canvas = await html2canvas(templateRef.current, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-      });
+      const params = new URLSearchParams();
+      if (selectedProtocolId) params.set("protocolId", selectedProtocolId);
 
-      const imgWidth = 210; // A4 width in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      const pdf = new jsPDF("p", "mm", "a4");
+      const res = await fetch(`/api/invoices/${invoiceId}/pdf?${params}`);
+      if (!res.ok) throw new Error("PDF generation failed");
 
-      // Handle multi-page if content is tall
-      const pageHeight = 297; // A4 height in mm
-      let remainingHeight = imgHeight;
-      let yOffset = 0;
-
-      while (remainingHeight > 0) {
-        if (yOffset > 0) pdf.addPage();
-        pdf.addImage(
-          canvas.toDataURL("image/png"),
-          "PNG",
-          0,
-          -yOffset,
-          imgWidth,
-          imgHeight
-        );
-        remainingHeight -= pageHeight;
-        yOffset += pageHeight;
-      }
-
-      pdf.save(`SOA-${invoiceData.soa_number}.pdf`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `SOA-${invoiceData.soa_number}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
     } catch (err) {
       console.error("PDF generation failed:", err);
     } finally {
       setDownloading(false);
     }
-  }, [invoiceData.soa_number]);
+  }, [invoiceId, selectedProtocolId, invoiceData.soa_number]);
 
   return (
     <div className="space-y-6">
@@ -147,10 +125,7 @@ export function InvoicePdfPreview({
           className="bg-white shadow-xl border border-border"
           style={{ width: "960px" }}
         >
-          <div
-            ref={templateRef}
-            style={{ borderTop: "8px solid #0a0a0a" }}
-          >
+          <div style={{ borderTop: "8px solid #0a0a0a" }}>
             <InvoiceHtmlTemplate data={currentData} />
           </div>
         </div>

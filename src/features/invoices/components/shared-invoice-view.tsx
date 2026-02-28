@@ -1,8 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
-import html2canvas from "html2canvas";
-import { jsPDF } from "jspdf";
+import { useState, useCallback } from "react";
 import { Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,6 +10,8 @@ import type { InvoiceOutputShape } from "../lib/invoice-output";
 
 interface SharedInvoiceViewProps {
   invoiceData: InvoiceOutputShape;
+  invoiceId: string;
+  shareToken: string;
 }
 
 function formatDate(iso: string): string {
@@ -27,49 +27,33 @@ function formatAmount(amount: number, currency: string): string {
   return `${symbol} ${amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
-export function SharedInvoiceView({ invoiceData }: SharedInvoiceViewProps) {
+export function SharedInvoiceView({
+  invoiceData,
+  invoiceId,
+  shareToken,
+}: SharedInvoiceViewProps) {
   const [downloading, setDownloading] = useState(false);
-  const templateRef = useRef<HTMLDivElement>(null);
 
   const handleDownload = useCallback(async () => {
-    if (!templateRef.current) return;
     setDownloading(true);
-
     try {
-      const canvas = await html2canvas(templateRef.current, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-      });
+      const params = new URLSearchParams({ shareToken });
+      const res = await fetch(`/api/invoices/${invoiceId}/pdf?${params}`);
+      if (!res.ok) throw new Error("PDF generation failed");
 
-      const imgWidth = 210;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      const pdf = new jsPDF("p", "mm", "a4");
-      const pageHeight = 297;
-      let remainingHeight = imgHeight;
-      let yOffset = 0;
-
-      while (remainingHeight > 0) {
-        if (yOffset > 0) pdf.addPage();
-        pdf.addImage(
-          canvas.toDataURL("image/png"),
-          "PNG",
-          0,
-          -yOffset,
-          imgWidth,
-          imgHeight
-        );
-        remainingHeight -= pageHeight;
-        yOffset += pageHeight;
-      }
-
-      pdf.save(`SOA-${invoiceData.soa_number}.pdf`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `SOA-${invoiceData.soa_number}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
     } catch (err) {
       console.error("PDF generation failed:", err);
     } finally {
       setDownloading(false);
     }
-  }, [invoiceData.soa_number]);
+  }, [invoiceId, shareToken, invoiceData.soa_number]);
 
   const statusVariant =
     invoiceData.status === "PAID"
@@ -86,7 +70,7 @@ export function SharedInvoiceView({ invoiceData }: SharedInvoiceViewProps) {
           className="bg-white shadow-lg border border-border mx-auto"
           style={{ maxWidth: "960px" }}
         >
-          <div ref={templateRef} style={{ borderTop: "8px solid #0a0a0a" }}>
+          <div style={{ borderTop: "8px solid #0a0a0a" }}>
             <InvoiceHtmlTemplate data={invoiceData} />
           </div>
         </div>

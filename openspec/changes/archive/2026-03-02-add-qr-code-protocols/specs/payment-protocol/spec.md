@@ -1,7 +1,5 @@
-## Purpose
+## MODIFIED Requirements
 
-Defines the payment protocol management system for storing and managing bank account details used in invoice payment sections.
-## Requirements
 ### Requirement: PaymentProtocol model
 The system SHALL store payment protocols with fields: `label` (string), `bankName` (string), `accountName` (string), `accountNumber` (string), `isDefault` (boolean, default false), and `qrData` (optional string). Only one protocol MAY be marked as default at a time. The `qrData` field SHALL store the raw EMVCo QR payload string decoded from an uploaded QR image or entered manually.
 
@@ -44,4 +42,3 @@ The system SHALL provide a dashboard page at `/dashboard/payment-protocols` for 
 - **WHEN** user deletes a payment protocol
 - **THEN** the protocol is removed from the database
 - **THEN** if the deleted protocol was default and others remain, the earliest-created remaining protocol becomes default
-

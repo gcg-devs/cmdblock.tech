@@ -19,6 +19,7 @@ interface PaymentProtocolOption {
   bankName: string;
   accountName: string;
   accountNumber: string;
+  qrData: string | null;
   isDefault: boolean;
 }
 
@@ -50,6 +51,7 @@ export function InvoicePdfPreview({
           bank_name: selectedProtocol.bankName,
           account_name: selectedProtocol.accountName,
           account_number: selectedProtocol.accountNumber,
+          qr_data: selectedProtocol.qrData ?? null,
         }
       : null,
   };

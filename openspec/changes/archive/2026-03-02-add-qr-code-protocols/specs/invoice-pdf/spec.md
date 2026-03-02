@@ -1,7 +1,5 @@
-## Purpose
+## MODIFIED Requirements
 
-Defines the invoice HTML template rendering, PDF preview page, and payment protocol selector for the invoice output system.
-## Requirements
 ### Requirement: Invoice HTML template
 The system SHALL render invoices as monochrome, printable HTML documents styled with the cmdblock.tech brand (>_ prompt motif, Syne and Geist Mono fonts) on a white background. The template SHALL include: header with brand and SOA metadata, billed-to section with client details, line items table, totals section, payment protocol details with optional branded QR code, and terms footer.
 
@@ -55,4 +53,3 @@ The system SHALL allow selecting a payment protocol on the PDF preview page, def
 #### Scenario: Change payment protocol
 - **WHEN** user selects a different payment protocol from the dropdown
 - **THEN** the rendered HTML template updates to show the newly selected protocol's details and QR code if available
-

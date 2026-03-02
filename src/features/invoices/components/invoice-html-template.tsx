@@ -1,3 +1,6 @@
+"use client";
+
+import { BrandedQr } from "@/features/payment-protocols/components/branded-qr";
 import type { InvoiceOutputShape } from "../lib/invoice-output";
 
 interface InvoiceHtmlTemplateProps {
@@ -317,33 +320,41 @@ export function InvoiceHtmlTemplate({ data }: InvoiceHtmlTemplateProps) {
                 background: "#fafafa",
                 padding: "14px 16px",
                 border: "1px solid #eee",
+                display: "flex",
+                gap: "16px",
+                alignItems: "center",
               }}
             >
-              <div style={{ fontWeight: 600, color: "#0a0a0a", marginBottom: "8px", fontSize: "13px" }}>
-                {data.payment_protocol.label}
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 600, color: "#0a0a0a", marginBottom: "8px", fontSize: "13px" }}>
+                  {data.payment_protocol.label}
+                </div>
+                <table style={{ fontFamily: mono, fontSize: "11px", color: "#666" }}>
+                  <tbody>
+                    <tr>
+                      <td style={{ paddingRight: "12px", paddingBottom: "2px" }}>Bank</td>
+                      <td style={{ color: "#0a0a0a", fontWeight: 600, paddingBottom: "2px" }}>
+                        {data.payment_protocol.bank_name}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ paddingRight: "12px", paddingBottom: "2px" }}>Name</td>
+                      <td style={{ color: "#0a0a0a", fontWeight: 600, paddingBottom: "2px" }}>
+                        {data.payment_protocol.account_name}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ paddingRight: "12px" }}>Acct</td>
+                      <td style={{ color: "#0a0a0a", fontWeight: 600 }}>
+                        {data.payment_protocol.account_number}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-              <table style={{ fontFamily: mono, fontSize: "11px", color: "#666" }}>
-                <tbody>
-                  <tr>
-                    <td style={{ paddingRight: "12px", paddingBottom: "2px" }}>Bank</td>
-                    <td style={{ color: "#0a0a0a", fontWeight: 600, paddingBottom: "2px" }}>
-                      {data.payment_protocol.bank_name}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style={{ paddingRight: "12px", paddingBottom: "2px" }}>Name</td>
-                    <td style={{ color: "#0a0a0a", fontWeight: 600, paddingBottom: "2px" }}>
-                      {data.payment_protocol.account_name}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style={{ paddingRight: "12px" }}>Acct</td>
-                    <td style={{ color: "#0a0a0a", fontWeight: 600 }}>
-                      {data.payment_protocol.account_number}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              {data.payment_protocol.qr_data && (
+                <BrandedQr data={data.payment_protocol.qr_data} size={100} />
+              )}
             </div>
           </div>
         )}

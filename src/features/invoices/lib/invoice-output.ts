@@ -40,13 +40,14 @@ export interface InvoiceOutputShape {
     bank_name: string;
     account_name: string;
     account_number: string;
+    qr_data: string | null;
   } | null;
   share_url: string | null;
 }
 
 export function buildInvoiceOutput(
   invoice: InvoiceWithRelations,
-  paymentProtocol?: Pick<PaymentProtocol, "label" | "bankName" | "accountName" | "accountNumber"> | null,
+  paymentProtocol?: Pick<PaymentProtocol, "label" | "bankName" | "accountName" | "accountNumber" | "qrData"> | null,
   teamProfile?: Pick<TeamProfile, "name" | "address" | "email"> | null
 ): InvoiceOutputShape {
   const project = invoice.project;
@@ -86,6 +87,7 @@ export function buildInvoiceOutput(
           bank_name: paymentProtocol.bankName,
           account_name: paymentProtocol.accountName,
           account_number: paymentProtocol.accountNumber,
+          qr_data: paymentProtocol.qrData ?? null,
         }
       : null,
     share_url:

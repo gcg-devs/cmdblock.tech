@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useActionState } from "react";
+import { useEffect, useActionState, useState, useRef } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { decodeQrFromImage } from "../lib/decode-qr-from-image";
 import {
   createPaymentProtocol,
   updatePaymentProtocol,
@@ -18,6 +20,7 @@ interface PaymentProtocolFormProps {
     bankName: string;
     accountName: string;
     accountNumber: string;
+    qrData: string | null;
   };
   onDone?: () => void;
 }
@@ -29,6 +32,11 @@ export function PaymentProtocolForm({ protocol, onDone }: PaymentProtocolFormPro
     ? updatePaymentProtocol.bind(null, protocol.id)
     : createPaymentProtocol;
   const [state, formAction, pending] = useActionState(action, initialState);
+  const [qrData, setQrData] = useState(protocol?.qrData ?? "");
+  const [qrDecoding, setQrDecoding] = useState(false);
+  const [qrError, setQrError] = useState("");
+  const [showManual, setShowManual] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (state.error) toast.error(state.error);
@@ -38,8 +46,34 @@ export function PaymentProtocolForm({ protocol, onDone }: PaymentProtocolFormPro
     }
   }, [state, onDone]);
 
+  async function handleQrUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setQrDecoding(true);
+    setQrError("");
+    try {
+      const decoded = await decodeQrFromImage(file);
+      if (decoded) {
+        setQrData(decoded);
+        setShowManual(false);
+        toast.success("QR code decoded successfully");
+      } else {
+        setQrError("Could not decode QR from image. Try a clearer image or enter data manually.");
+        setShowManual(true);
+      }
+    } catch {
+      setQrError("Failed to process image. Try a different file.");
+      setShowManual(true);
+    } finally {
+      setQrDecoding(false);
+    }
+  }
+
   return (
     <form action={formAction} className="space-y-4 max-w-md">
+      <input type="hidden" name="qrData" value={qrData} />
+
       <div className="space-y-2">
         <Label className="text-xs tracking-[0.15em] uppercase">Label</Label>
         <Input
@@ -78,6 +112,76 @@ export function PaymentProtocolForm({ protocol, onDone }: PaymentProtocolFormPro
           placeholder="e.g. 1094 5678 9012"
           required
         />
+      </div>
+
+      {/* QR Code Section */}
+      <div className="space-y-2 rounded-md border border-dashed border-muted-foreground/30 p-4">
+        <Label className="text-xs tracking-[0.15em] uppercase">
+          QR Code <span className="text-muted-foreground">(Optional)</span>
+        </Label>
+
+        <div className="space-y-3">
+          <div>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              onChange={handleQrUpload}
+              className="hidden"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={qrDecoding}
+              onClick={() => fileRef.current?.click()}
+            >
+              {qrDecoding ? "Decoding..." : "Upload QR Image"}
+            </Button>
+          </div>
+
+          {qrError && (
+            <p className="text-xs text-destructive">{qrError}</p>
+          )}
+
+          {qrData && (
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground">Decoded QR data:</p>
+              <pre className="text-xs bg-muted p-2 rounded overflow-auto max-h-20 whitespace-pre-wrap break-all">
+                {qrData}
+              </pre>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="text-xs h-7"
+                onClick={() => { setQrData(""); if (fileRef.current) fileRef.current.value = ""; }}
+              >
+                Clear QR
+              </Button>
+            </div>
+          )}
+
+          {(showManual || (!qrData && !qrDecoding)) && (
+            <div className="space-y-1">
+              <button
+                type="button"
+                className="text-xs text-muted-foreground underline"
+                onClick={() => setShowManual(!showManual)}
+              >
+                {showManual ? "Hide manual entry" : "Or enter QR data manually"}
+              </button>
+              {showManual && (
+                <Textarea
+                  value={qrData}
+                  onChange={(e) => setQrData(e.target.value)}
+                  placeholder="Paste EMVCo QR data string here..."
+                  className="text-xs font-mono h-20"
+                />
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="flex items-center gap-3">

@@ -16,6 +16,7 @@ export async function createPaymentProtocol(
   const bankName = (formData.get("bankName") as string)?.trim();
   const accountName = (formData.get("accountName") as string)?.trim();
   const accountNumber = (formData.get("accountNumber") as string)?.trim();
+  const qrData = (formData.get("qrData") as string)?.trim() || null;
 
   if (!label) return { error: "Label is required" };
   if (!bankName) return { error: "Bank name is required" };
@@ -26,7 +27,7 @@ export async function createPaymentProtocol(
   const isDefault = count === 0;
 
   await prisma.paymentProtocol.create({
-    data: { label, bankName, accountName, accountNumber, isDefault },
+    data: { label, bankName, accountName, accountNumber, qrData, isDefault },
   });
 
   revalidatePath("/dashboard/payment-protocols");
@@ -42,6 +43,7 @@ export async function updatePaymentProtocol(
   const bankName = (formData.get("bankName") as string)?.trim();
   const accountName = (formData.get("accountName") as string)?.trim();
   const accountNumber = (formData.get("accountNumber") as string)?.trim();
+  const qrData = (formData.get("qrData") as string)?.trim() || null;
 
   if (!label) return { error: "Label is required" };
   if (!bankName) return { error: "Bank name is required" };
@@ -50,7 +52,7 @@ export async function updatePaymentProtocol(
 
   await prisma.paymentProtocol.update({
     where: { id },
-    data: { label, bankName, accountName, accountNumber },
+    data: { label, bankName, accountName, accountNumber, qrData },
   });
 
   revalidatePath("/dashboard/payment-protocols");

@@ -1,28 +1,4 @@
-## Purpose
-
-Defines the enriched data model for Project scope fields, LineItem names, and the structured invoice output shape utility used for SOA rendering.
-## Requirements
-### Requirement: Project scope fields
-The Project model SHALL have a `scopeDescription` text field and a `showScopeOnInvoice` boolean field. The project form SHALL include inputs for both fields.
-
-#### Scenario: Create project with scope
-- **WHEN** user fills in the project form with a scope description and the show-scope toggle enabled
-- **THEN** the project is saved with `scopeDescription` and `showScopeOnInvoice = true`
-
-#### Scenario: Edit project scope visibility
-- **WHEN** user toggles "Show Scope on Invoice" off on a project
-- **THEN** `showScopeOnInvoice` is set to false and invoices for this project omit the scope block in output
-
-### Requirement: Line item name field
-Each LineItem SHALL have a `name` field (short label) in addition to the existing `description` (detailed text) and `amount`.
-
-#### Scenario: Create invoice with named line items
-- **WHEN** user adds a line item with name "Mobilization Fee (30%)", description "Initial payment to provision...", and amount 75000
-- **THEN** the line item is saved with all three fields
-
-#### Scenario: Display line item on detail page
-- **WHEN** user views an invoice detail page
-- **THEN** each line item shows the name as a bold header and the description below it
+## MODIFIED Requirements
 
 ### Requirement: Invoice output shape
 The system SHALL provide a utility function that produces a structured JSON representation of an invoice including project scope, line items, client billing address, payment protocol details with optional QR data, and share URL.
@@ -62,4 +38,3 @@ The system SHALL provide a utility function that produces a structured JSON repr
 #### Scenario: Generate output without share URL
 - **WHEN** the output function is called for an invoice without a share token or with `isPublic = false`
 - **THEN** the output includes `share_url` as null
-

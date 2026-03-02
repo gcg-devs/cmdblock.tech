@@ -3,6 +3,7 @@ import {
   Page,
   View,
   Text,
+  Image,
   Font,
   StyleSheet,
 } from "@react-pdf/renderer";
@@ -343,9 +344,10 @@ const s = StyleSheet.create({
 
 interface InvoicePdfDocumentProps {
   data: InvoiceOutputShape;
+  qrImageDataUrl?: string | null;
 }
 
-export function InvoicePdfDocument({ data }: InvoicePdfDocumentProps) {
+export function InvoicePdfDocument({ data, qrImageDataUrl }: InvoicePdfDocumentProps) {
   const cs = data.currency === "USD" ? "$" : "PHP";
 
   return (
@@ -491,28 +493,33 @@ export function InvoicePdfDocument({ data }: InvoicePdfDocumentProps) {
             {data.payment_protocol ? (
               <View style={s.footerCol}>
                 <Text style={s.label}>Payment Protocol</Text>
-                <View style={s.protocolBox}>
-                  <Text style={s.protocolLabel}>
-                    {data.payment_protocol.label}
-                  </Text>
-                  <View style={s.protocolRow}>
-                    <Text style={s.protocolKey}>Bank</Text>
-                    <Text style={s.protocolVal}>
-                      {data.payment_protocol.bank_name}
+                <View style={[s.protocolBox, { flexDirection: "row", alignItems: "center", gap: pt(12) }]}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={s.protocolLabel}>
+                      {data.payment_protocol.label}
                     </Text>
+                    <View style={s.protocolRow}>
+                      <Text style={s.protocolKey}>Bank</Text>
+                      <Text style={s.protocolVal}>
+                        {data.payment_protocol.bank_name}
+                      </Text>
+                    </View>
+                    <View style={s.protocolRow}>
+                      <Text style={s.protocolKey}>Name</Text>
+                      <Text style={s.protocolVal}>
+                        {data.payment_protocol.account_name}
+                      </Text>
+                    </View>
+                    <View style={[s.protocolRow, { marginBottom: 0 }]}>
+                      <Text style={s.protocolKey}>Acct</Text>
+                      <Text style={s.protocolVal}>
+                        {data.payment_protocol.account_number}
+                      </Text>
+                    </View>
                   </View>
-                  <View style={s.protocolRow}>
-                    <Text style={s.protocolKey}>Name</Text>
-                    <Text style={s.protocolVal}>
-                      {data.payment_protocol.account_name}
-                    </Text>
-                  </View>
-                  <View style={[s.protocolRow, { marginBottom: 0 }]}>
-                    <Text style={s.protocolKey}>Acct</Text>
-                    <Text style={s.protocolVal}>
-                      {data.payment_protocol.account_number}
-                    </Text>
-                  </View>
+                  {qrImageDataUrl ? (
+                    <Image src={qrImageDataUrl} style={{ width: pt(90), height: pt(90) }} />
+                  ) : null}
                 </View>
               </View>
             ) : null}

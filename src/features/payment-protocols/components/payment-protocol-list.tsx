@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import { DeleteEntityDialog } from "@/components/delete-entity-dialog";
 import { PaymentProtocolForm } from "./payment-protocol-form";
+import { BrandedQr } from "./branded-qr";
 import { deletePaymentProtocol, setDefaultPaymentProtocol } from "../actions";
 
 interface Protocol {
@@ -21,6 +22,7 @@ interface Protocol {
   bankName: string;
   accountName: string;
   accountNumber: string;
+  qrData: string | null;
   isDefault: boolean;
 }
 
@@ -57,6 +59,7 @@ export function PaymentProtocolList({ protocols }: PaymentProtocolListProps) {
               <TableHead>Bank</TableHead>
               <TableHead>Account Name</TableHead>
               <TableHead>Account No.</TableHead>
+              <TableHead>QR</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -64,7 +67,7 @@ export function PaymentProtocolList({ protocols }: PaymentProtocolListProps) {
             {protocols.map((p) => (
               <TableRow key={p.id}>
                 {editingId === p.id ? (
-                  <TableCell colSpan={5}>
+                  <TableCell colSpan={6}>
                     <PaymentProtocolForm
                       protocol={p}
                       onDone={() => setEditingId(null)}
@@ -83,6 +86,13 @@ export function PaymentProtocolList({ protocols }: PaymentProtocolListProps) {
                     <TableCell>{p.bankName}</TableCell>
                     <TableCell>{p.accountName}</TableCell>
                     <TableCell className="font-mono">{p.accountNumber}</TableCell>
+                    <TableCell>
+                      {p.qrData ? (
+                        <BrandedQr data={p.qrData} size={48} />
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
                         {!p.isDefault && (

@@ -80,10 +80,26 @@ export async function GET(
 
   const invoiceData = buildInvoiceOutput(invoice, protocol, teamProfile);
 
+  // Generate QR code data URL for PDF if protocol has QR data
+  let qrImageDataUrl: string | null = null;
+  if (invoiceData.payment_protocol?.qr_data) {
+    try {
+      const QRCode = (await import("qrcode")).default;
+      qrImageDataUrl = await QRCode.toDataURL(invoiceData.payment_protocol.qr_data, {
+        errorCorrectionLevel: "H",
+        width: 400,
+        margin: 2,
+        color: { dark: "#0a0a0a", light: "#ffffff" },
+      });
+    } catch (e) {
+      console.error("QR generation failed:", e);
+    }
+  }
+
   try {
     const { renderToBuffer } = await import("@react-pdf/renderer");
     const pdfBuffer = await renderToBuffer(
-      createElement(InvoicePdfDocument, { data: invoiceData }) as any
+      createElement(InvoicePdfDocument, { data: invoiceData, qrImageDataUrl }) as any
     );
 
     return new NextResponse(new Uint8Array(pdfBuffer), {

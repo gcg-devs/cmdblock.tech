@@ -98,8 +98,12 @@ export async function GET(
 
   try {
     const { renderToBuffer } = await import("@react-pdf/renderer");
+    const pdfElement = createElement(InvoicePdfDocument, {
+      data: invoiceData,
+      qrImageDataUrl,
+    }) as Parameters<typeof renderToBuffer>[0];
     const pdfBuffer = await renderToBuffer(
-      createElement(InvoicePdfDocument, { data: invoiceData, qrImageDataUrl }) as any
+      pdfElement
     );
 
     return new NextResponse(new Uint8Array(pdfBuffer), {

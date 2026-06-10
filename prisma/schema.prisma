@@ -47,6 +47,13 @@ enum InvoiceStatus {
   OVERDUE
 }
 
+enum ContractStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  EXPIRED
+}
+
 model Client {
   id             String    @id @default(cuid())
   name           String
@@ -97,6 +104,44 @@ model LineItem {
   name        String  @default("")
   description String
   amount      Float
+}
+
+model ContractProposal {
+  id                 String             @id @default(cuid())
+  contractNumber     String             @unique
+  title              String
+  clientName         String
+  preparedBy         String
+  issueDate          DateTime
+  validUntil         DateTime?
+  currency           Currency           @default(PHP)
+  status             ContractStatus     @default(DRAFT)
+  overview           String             @default("")
+  recommendedScope   String             @default("")
+  integrationNotes   String             @default("")
+  timeline           String             @default("")
+  paymentTerms       String             @default("")
+  changeRequests     String             @default("")
+  warranty           String             @default("")
+  exclusions         String             @default("")
+  maintenance        String             @default("")
+  legalNote          String             @default("")
+  totalAmount        Float              @default(0)
+  shareToken         String?            @unique
+  isPublic           Boolean            @default(false)
+  lineItems          ContractLineItem[]
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+}
+
+model ContractLineItem {
+  id          String           @id @default(cuid())
+  contractId  String
+  contract    ContractProposal @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  name        String
+  description String           @default("")
+  amount      Float
+  sortOrder   Int              @default(0)
 }
 
 model PaymentProtocol {

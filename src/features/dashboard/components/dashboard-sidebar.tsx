@@ -7,6 +7,7 @@ import {
   Users,
   FolderKanban,
   FileText,
+  FileSignature,
   CreditCard,
   UserCog,
   LogOut,
@@ -29,6 +30,7 @@ const navItems = [
   { title: "Clients", href: "/dashboard/clients", icon: Users },
   { title: "Projects", href: "/dashboard/projects", icon: FolderKanban },
   { title: "Invoices", href: "/dashboard/invoices", icon: FileText },
+  { title: "Contracts", href: "/dashboard/contracts", icon: FileSignature },
   { title: "Payment Protocols", href: "/dashboard/payment-protocols", icon: CreditCard },
   { title: "Team Profile", href: "/dashboard/team-profile", icon: UserCog },
 ];
